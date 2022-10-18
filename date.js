@@ -1,6 +1,5 @@
 const calendarID = document.getElementById('datepicker-container');
-const selectInputFrom = document.getElementById('select-date-from');
-const selectInputTo = document.getElementById('select-date-to');
+const selectInput = document.getElementById('selected-dates');
 const calendarBody = document.querySelector('.datepicker-body');
 const monthSelect = document.querySelector('.pick-month-select')
 const yearSelect = document.querySelector('.pick-year-select')
@@ -12,7 +11,7 @@ yearSelect.value = new Date().getFullYear()
 monthSelect.value = new Date().getMonth()
 
 // show & hide calendar
-selectInputFrom.addEventListener('focus', () => {
+selectInput.addEventListener('focus', () => {
 	calendarID.classList.add('show')
 });
 // on click anywhere in document hide calendar
@@ -24,7 +23,7 @@ calendarID.addEventListener('click', (event) => {
 	event.stopPropagation()
 });
 // on click inside input prevent hide
-selectInputFrom.addEventListener('click', (event) => {
+selectInput.addEventListener('click', (event) => {
 	event.stopPropagation()
 });
 
@@ -68,7 +67,6 @@ function showHideCalendarMonths() {
 
 // populate body of calendar with accurate days of selected month & year
 function calcCalendarDays() {
-
 	// Date variables to calculate previous, current and next months dates
 	let selectedMonth = +monthSelect.value;
 	let selectedYear = +yearSelect.value;
@@ -143,7 +141,7 @@ function selectedRange(e) {
 		counter++
 		fromDate = e.target
 		fromDate.classList.add('highlight-from')
-		selectInputFrom.value = fromDate.value
+		selectInput.value = `${fromDate.value} - `
 	} else if (fromDate && counter == 1) {
 		// if true selected dates are invalid
 		if (validateDates(e.target.value, fromDate.value)) {
@@ -153,27 +151,27 @@ function selectedRange(e) {
 			counter++
 			toDate = e.target
 			toDate.classList.add('highlight-to')
-			selectInputTo.value = toDate.value
+			selectInput.value = selectInput.value + toDate.value
 			highlightSelection()
 			let numberOfDays = numberOfDaysSelected(fromDate, toDate)
 			selectedDays.innerHTML = numberOfDays
+			calendarBody.style.cursor = 'not-allowed'
 		}
 	} else {
 		// reset selections
 		counter = 0
-		selectInputFrom.value = ''
-		selectInputTo.value = ''
+		selectInput.value = ''
 		selectedDays.innerHTML = ''
 		calendarBody.querySelectorAll(`[class*='highlight']`).forEach(day => {
 			day.classList.remove('highlight-from')
 			day.classList.remove('highlight-to')
 			day.classList.remove('highlight-range')
 		})
+		calendarBody.style.cursor = 'default'
 	}
 }
 
 function validateDates(to, from) {
-
 	// returns true if the TO date occurs before the FROM date
 	let fromDate = Date.parse(from).toLocaleString('en-us')
 	let toDate = Date.parse(to).toLocaleString('en-us')
@@ -190,7 +188,6 @@ function highlightSelection() {
 	let monthElements = calendarBody.querySelectorAll('.monthWrap')
 	let fromDate = calendarBody.querySelector('.highlight-from')
 	let toDate = calendarBody.querySelector('.highlight-to')
-
 	// check if days already selected need to be highlighted as some dates
 	// occur multiple times between calendar changes (prev & next month days)
 	if (fromDate || toDate) {
