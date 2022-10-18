@@ -17,8 +17,27 @@ a {text-decoration:none;}
 }
 
 .form-group {
+    position: relative;
     display:grid;
-    grid-template-columns:auto auto auto auto;
+}
+
+.input-wrap {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+    width: fit-content;
+    align-items: center;
+    justify-self: center;
+}
+
+.input-wrap input {
+    width: 300px;
+    height: 45px;
+}
+
+.input-wrap svg {
+    position: absolute;
+    right: 5px;
 }
 
 .datepicker-form {
@@ -48,11 +67,13 @@ a {text-decoration:none;}
 /* Datepicker popup form styles */
 
 .datepicker-container {
+    display:none;
+    position:absolute;
+    top: 50px;
+    right: 50%;
+    translate: 50%;
     width:350px;
     text-align:center;
-    display:none; /* create a show/hide with js */
-    position:absolute;
-    margin:50px 0 0 95px;
     border:3px solid white;
     box-shadow: 3px 3px 10px #999;
 }
@@ -81,8 +102,9 @@ a {text-decoration:none;}
 
 .datepicker-days-row .day   {padding:10px 2px;}
 
+.datepicker-body { cursor: pointer; }
+
 .datepicker-body option {
-    cursor:pointer;
     padding:10px;
 }
 
