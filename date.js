@@ -30,12 +30,12 @@ selectInput.addEventListener('click', (event) => {
 monthSelect.addEventListener('change', () => {
 	showHideCalendarMonths()
 	highlightSelection()
-})
+});
 
 yearSelect.addEventListener('change', () => {
 	showHideCalendarMonths()
 	highlightSelection()
-})
+});
 
 // render default calendar based on current date
 calcCalendarDays();
@@ -68,8 +68,8 @@ function showHideCalendarMonths() {
 // populate body of calendar with accurate days of selected month & year
 function calcCalendarDays() {
 	// Date variables to calculate previous, current and next months dates
-	let selectedMonth = +monthSelect.value;
-	let selectedYear = +yearSelect.value;
+	let selectedMonth = Number(monthSelect.value);
+	let selectedYear = Number(yearSelect.value);
 	let currentMonth = new Date(selectedYear, selectedMonth, 1);
 	let firstDayPrevMonth = new Date(selectedYear, selectedMonth, 0).getDate();
 	// getDay() returns day as int 0=sun, 1=mon.. 6=sat etc
@@ -89,23 +89,23 @@ function calcCalendarDays() {
 	monthWrap.classList.add('monthWrap')
 	calendarBody.appendChild(monthWrap)
 
-	// previous month calc
+	// show some days from previous month
 	for (let i = (firstDayPrevMonth + 1) - firstDayMonth; i < firstDayPrevMonth; i++) {
-		let pmc = new Date(prevMonth);
+		let prevMonthDays = new Date(prevMonth);
 		prevMonth.setDate(prevMonth.getDate() + 1);
-		insertDaysHTML(pmc, 'date not-current-month', monthWrap);
+		insertDaysHTML(prevMonthDays, 'date not-current-month', monthWrap);
 	}
 	// current month calc
 	while (currentMonth.getMonth() === selectedMonth) {
-		let cmc = new Date(currentMonth);
+		let currentMonthDays = new Date(currentMonth);
 		currentMonth.setDate(currentMonth.getDate() + 1);
-		insertDaysHTML(cmc, 'date', monthWrap);
+		insertDaysHTML(currentMonthDays, 'date', monthWrap);
 	}
-	// next month calc
+	// show some days from next month
 	for (let i = 1; i <= 7 - lastDayMonth; i++) {
-		let nmc = new Date(nextMonth);
+		let nextMonthDays = new Date(nextMonth);
 		nextMonth.setDate(nextMonth.getDate() + 1);
-		insertDaysHTML(nmc, 'date not-current-month', monthWrap);
+		insertDaysHTML(nextMonthDays, 'date not-current-month', monthWrap);
 	}
 	// adds event listeners to all days in the calendar
 	addDaysEventListeners()
@@ -137,29 +137,8 @@ function addDaysEventListeners() {
 // highlights user selected days in the calendar
 function selectedRange(e) {
 
-	if (e.target && counter == 0) {
-		counter++
-		fromDate = e.target
-		fromDate.classList.add('highlight-from')
-		selectInput.value = `${fromDate.value} - `
-	} else if (fromDate && counter == 1) {
-		// if true selected dates are invalid
-		if (validateDates(e.target.value, fromDate.value)) {
-			alert('Invalid selection')
-			// else dates are valid, add selection
-		} else {
-			counter++
-			toDate = e.target
-			toDate.classList.add('highlight-to')
-			selectInput.value = selectInput.value + toDate.value
-			highlightSelection()
-			let numberOfDays = numberOfDaysSelected(fromDate, toDate)
-			selectedDays.innerHTML = numberOfDays
-			calendarBody.style.cursor = 'not-allowed'
-		}
-	} else {
-		// reset selections
-		counter = 0
+	if (e.target && counter === 0) {
+		// reset selection before starting new one
 		selectInput.value = ''
 		selectedDays.innerHTML = ''
 		calendarBody.querySelectorAll(`[class*='highlight']`).forEach(day => {
@@ -167,12 +146,28 @@ function selectedRange(e) {
 			day.classList.remove('highlight-to')
 			day.classList.remove('highlight-range')
 		})
-		calendarBody.style.cursor = 'default'
+		counter++
+		fromDate = e.target
+		fromDate.classList.add('highlight-from')
+		selectInput.value = `${fromDate.value} - `
+	} else if (fromDate && counter === 1) {
+		// if true selected dates are invalid
+		if (validateDates(e.target.value, fromDate.value)) {
+			return alert('Invalid selection')
+			// else dates are valid, add selection
+		}
+		counter = 0
+		toDate = e.target
+		toDate.classList.add('highlight-to')
+		selectInput.value = selectInput.value + toDate.value
+		highlightSelection()
+		let numberOfDays = numberOfDaysSelected(fromDate, toDate)
+		selectedDays.innerHTML = numberOfDays
 	}
 }
 
 function validateDates(to, from) {
-	// returns true if the TO date occurs before the FROM date
+	// prevents highlighting days that occur before initial selection
 	let fromDate = Date.parse(from).toLocaleString('en-us')
 	let toDate = Date.parse(to).toLocaleString('en-us')
 
